@@ -1,0 +1,55 @@
+
+
+The basic structure for my program is a large hash table of pointers to custom Node objects. Each Node object has a value string, a pointer to the next Node in the linked list, and a vector called permutations.  The values held within the Node's value string are dictionary words reordered to be in alphabetic order. For instance, if the input word given is "tractor", the word is reordered using the sort algorithm in the algorithm library and is stored as value "acorrtt". Meanwhile, the word "tractor" gets pushed onto the Node's permutations vector.
+
+
+
+insert(string word):
+
+	remove non-letters of the word
+	store the word in its regular state
+	sort the word, arranging characters in alphabetic order
+	hash the word and store its result in an index variable
+	
+	if the given bucket is empty:
+		create a new node and store the alphabetically ordered word as its value
+		add the regular word to the Node's vector of permutations
+		
+	otherwise, if the bucket has another anagram of the word:
+		add the new anagram to the Node's vector of permutations
+		
+	otherwise:
+		add a node at the beginning of the list and store the alphabetically ordered word as its value
+		add the regular word to the Node's vector of permutations
+
+
+lookup(string letters, void callback(string)) const:
+
+	remove non-letters of the parameter
+	sort the parameter in alphabetic order
+	
+	hash the parameter and store its result in an index variable
+	
+	for each Node at the given index:
+		if the parameter equals the value string of a Node:
+			call the function callback for each word in the Node's permutations vector
+			
+hashParam(const string word)
+
+	set the result to one
+	loop through the word's characters:
+		multiply the result by a prime number mapped to the given character
+		
+	return the result
+		
+
+There were several other models that I experimented with before settling on what I described above. First, I tried to use a standard hash table. When looking for a possible match, I would loop through every permutation of a word to see if it matches what is in the hash table at a given key. This became horribly inefficient for longer words, with the function having to look through thousands and thousands of different permutations per word in a given bucket.
+
+I then tried to cheat the system by implementing a function that summed the ascii character values of a string and assumed that if the input character sum matches a given word's character sum, they must be the same word. However, this was foiled by the thorough correctness test, in which an input was given with an equal sum to a different word in the dictionary.
+
+When I tried out the alphabetic ordering of values in my hash table, I realized that anagrams wouldn't be able to be differentiated from each other. For example, if I insert the word "war" into my hash table, and then insert the word "raw", both will be converted into "arw" and will be indistinguishable from each other. To solve this, I needed to store the regular string (the one not converted into alphabetical order) in each Node. I chose a vector for this purpose, allowing me to store every permutation within a single node for quick retrieval.
+
+The model that I ended up using requires a lot of memory for initial allocations, given that each of the 49,999 nodes has its own member vector, but lookups are very fast.
+
+It's also worth mentioning that my hash function is not ideal, with a large amount of the 49,999 nodes going unused.
+
